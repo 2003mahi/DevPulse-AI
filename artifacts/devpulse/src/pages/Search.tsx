@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useGithubSearch } from '@/services/github';
+import { useGithubSearch, fetchGithubUser } from '@/services/github';
 import { useAddFavorite, useGetFavorites, useRemoveFavorite, getGetFavoritesQueryKey } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
@@ -33,9 +33,9 @@ export default function Search() {
   const addFavorite = useAddFavorite();
   const removeFavorite = useRemoveFavorite();
 
-  const handleToggleFavorite = (user: any) => {
+  const handleToggleFavorite = async (user: any) => {
     const isSaved = favorites?.some(f => f.githubLogin === user.login);
-    
+
     if (isSaved) {
       removeFavorite.mutate({ githubLogin: user.login }, {
         onSuccess: () => {
@@ -47,12 +47,23 @@ export default function Search() {
         }
       });
     } else {
+      // Search API only returns basic fields — fetch the full profile first
+      // so we store real name, bio, followers, and public repo count.
+      let fullProfile: any = null;
+      try {
+        fullProfile = await fetchGithubUser(user.login);
+      } catch {
+        // Non-fatal: fall back to search-result data
+      }
+
       addFavorite.mutate({
         data: {
           githubLogin: user.login,
-          avatarUrl: user.avatar_url,
-          name: user.name || user.login,
-          bio: user.bio,
+          avatarUrl: fullProfile?.avatar_url ?? user.avatar_url,
+          name: fullProfile?.name ?? user.login,
+          bio: fullProfile?.bio ?? undefined,
+          followers: fullProfile?.followers ?? undefined,
+          publicRepos: fullProfile?.public_repos ?? undefined,
         }
       }, {
         onSuccess: () => {
@@ -171,7 +182,7 @@ export default function Search() {
             )}
           </div>
 
-          {searchResults?.total_count > 10 && (
+          {(searchResults?.total_count ?? 0) > 10 && (
             <div className="flex justify-center gap-2 pt-4">
               <Button 
                 variant="outline" 

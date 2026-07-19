@@ -105,9 +105,9 @@ function SortableTaskCard({ task, onEdit, onDelete }: { task: Task, onEdit: (t: 
           )}
         </div>
         
-        {task.tags && (
+        {task.tags && task.tags.trim() && (
           <div className="flex flex-wrap gap-1">
-            {task.tags.split(',').map(tag => (
+            {task.tags.split(',').filter(t => t.trim()).map(tag => (
               <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-sm bg-muted/50 text-muted-foreground">
                 {tag.trim()}
               </span>
@@ -398,15 +398,14 @@ export default function Tasks() {
             ))}
 
             <DragOverlay dropAnimation={{ sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: "0.5" } } }) }}>
-              {activeId ? (
-                <div className="opacity-80 rotate-2">
-                  <SortableTaskCard 
-                    task={tasks.find(t => t.id.toString() === activeId)!} 
-                    onEdit={() => {}} 
-                    onDelete={() => {}} 
-                  />
-                </div>
-              ) : null}
+              {activeId ? (() => {
+                const draggingTask = tasks.find(t => t.id.toString() === activeId);
+                return draggingTask ? (
+                  <div className="opacity-80 rotate-2">
+                    <SortableTaskCard task={draggingTask} onEdit={() => {}} onDelete={() => {}} />
+                  </div>
+                ) : null;
+              })() : null}
             </DragOverlay>
           </DndContext>
         </div>

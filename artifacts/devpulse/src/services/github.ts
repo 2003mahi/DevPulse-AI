@@ -6,38 +6,50 @@ const fetcher = async (url: string) => {
     if (res.status === 403 || res.status === 429) {
       throw new Error('GitHub rate limit reached — try again in a minute');
     }
+    if (res.status === 404) {
+      throw new Error('GitHub user not found');
+    }
     throw new Error('Failed to fetch from GitHub');
   }
   return res.json();
 };
 
-export const useGithubProfile = (username?: string | null) => 
+export const useGithubProfile = (username?: string | null) =>
   useQuery({
     queryKey: ['github-profile', username],
     queryFn: () => fetcher(`https://api.github.com/users/${username}`),
     enabled: !!username,
-    staleTime: 1000 * 60 * 5, // 5 mins
+    staleTime: 1000 * 60 * 5,
+    retry: false, // fail fast — no point retrying 404 or rate-limit
   });
 
-export const useGithubRepos = (username?: string | null) => 
+export const useGithubRepos = (username?: string | null) =>
   useQuery({
     queryKey: ['github-repos', username],
-    queryFn: () => fetcher(`https://api.github.com/users/${username}/repos?sort=updated&per_page=6`),
+    queryFn: () => fetcher(`https://api.github.com/users/${username}/repos?sort=updated&per_page=30`),
     enabled: !!username,
     staleTime: 1000 * 60 * 5,
+    retry: false,
   });
 
-export const useGithubEvents = (username?: string | null) => 
+export const useGithubEvents = (username?: string | null) =>
   useQuery({
     queryKey: ['github-events', username],
-    queryFn: () => fetcher(`https://api.github.com/users/${username}/events?per_page=10`),
+    queryFn: () => fetcher(`https://api.github.com/users/${username}/events?per_page=30`),
     enabled: !!username,
     staleTime: 1000 * 60 * 5,
+    retry: false,
   });
 
-export const useGithubSearch = (query: string, page: number = 1) => 
+export const useGithubSearch = (query: string, page: number = 1) =>
   useQuery({
     queryKey: ['github-search', query, page],
-    queryFn: () => fetcher(`https://api.github.com/search/users?q=${query}&per_page=10&page=${page}`),
+    queryFn: () =>
+      fetcher(`https://api.github.com/search/users?q=${encodeURIComponent(query)}&per_page=10&page=${page}`),
     enabled: !!query,
+    retry: false,
   });
+
+// Fetch a single user's full profile (for enriching favorites)
+export const fetchGithubUser = (username: string): Promise<any> =>
+  fetcher(`https://api.github.com/users/${username}`);

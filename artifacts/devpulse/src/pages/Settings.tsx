@@ -153,10 +153,10 @@ export default function Settings() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-lg hover-elevate transition-all">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base">Dark Mode</FormLabel>
-                  <FormDescription>
+                  <label className="text-base font-medium leading-none">Dark Mode</label>
+                  <p className="text-sm text-muted-foreground">
                     Switch between light and dark themes.
-                  </FormDescription>
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button 

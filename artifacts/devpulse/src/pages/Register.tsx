@@ -12,39 +12,40 @@ import { LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const registerSchema = z.object({
-  name: z.string().min(2, { message: 'Name is required' }),
+  name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
   email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
   githubUsername: z.string().min(1, { message: 'GitHub username is required' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
 });
 
 export default function Register() {
   const [, setLocation] = useLocation();
-  const login = useAppStore((state) => state.login);
+  const { registerAccount } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      githubUsername: '',
-    },
+    defaultValues: { name: '', email: '', githubUsername: '', password: '' },
   });
 
-  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
-    // Simulate API call
+    setAuthError('');
     setTimeout(() => {
-      login({
+      const result = registerAccount({
         name: values.name,
         email: values.email,
+        password: values.password,
         githubUsername: values.githubUsername,
       });
-      setLocation('/dashboard');
+      if (result.success) {
+        setLocation('/dashboard');
+      } else {
+        setAuthError(result.error || 'Registration failed.');
+      }
       setIsLoading(false);
-    }, 800);
+    }, 600);
   };
 
   return (
@@ -52,7 +53,7 @@ export default function Register() {
       <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-chart-4/10 blur-3xl pointer-events-none" />
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -113,7 +114,7 @@ export default function Register() {
                         <Input placeholder="octocat" disabled={isLoading} {...field} />
                       </FormControl>
                       <FormDescription>
-                        We use this to fetch your stats and activity.
+                        Used to fetch your stats, repos, and activity feed.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -132,8 +133,15 @@ export default function Register() {
                     </FormItem>
                   )}
                 />
+
+                {authError && (
+                  <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
+                    {authError}
+                  </p>
+                )}
+
                 <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-                  {isLoading ? 'Creating account...' : 'Sign up'}
+                  {isLoading ? 'Creating account…' : 'Sign up'}
                 </Button>
               </form>
             </Form>

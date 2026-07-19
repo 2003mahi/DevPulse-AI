@@ -18,33 +18,32 @@ const loginSchema = z.object({
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const login = useAppStore((state) => state.login);
+  const { login, loginWithCredentials } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: { email: '', password: '' },
   });
 
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+  const onSubmit = (values: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
-    // Simulate API call
+    setAuthError('');
     setTimeout(() => {
-      login({
-        name: 'Demo User',
-        email: values.email,
-        githubUsername: 'octocat',
-      });
-      setLocation('/dashboard');
+      const result = loginWithCredentials(values.email, values.password);
+      if (result.success) {
+        setLocation('/dashboard');
+      } else {
+        setAuthError(result.error || 'Login failed.');
+      }
       setIsLoading(false);
-    }, 800);
+    }, 400);
   };
 
   const handleDemoLogin = () => {
     setIsLoading(true);
+    setAuthError('');
     setTimeout(() => {
       login({
         name: 'Demo User',
@@ -58,11 +57,10 @@ export default function Login() {
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center items-center p-4 bg-background relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-chart-2/10 blur-3xl pointer-events-none" />
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -113,8 +111,15 @@ export default function Login() {
                     </FormItem>
                   )}
                 />
+
+                {authError && (
+                  <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
+                    {authError}
+                  </p>
+                )}
+
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : 'Sign in'}
+                  {isLoading ? 'Signing in…' : 'Sign in'}
                 </Button>
               </form>
             </Form>
@@ -128,10 +133,10 @@ export default function Login() {
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              type="button" 
-              className="w-full flex items-center gap-2" 
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full flex items-center gap-2"
               onClick={handleDemoLogin}
               disabled={isLoading}
             >

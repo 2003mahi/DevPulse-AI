@@ -1,0 +1,321 @@
+You are a Senior Frontend Architect with 8+ years of experience building production SaaS applications.
+
+Your task is to design and build a complete Tier-2 Advanced Frontend project that demonstrates professional frontend engineering skills.
+
+PROJECT TITLE:
+"DevPulse - AI Powered Developer Productivity Dashboard"
+
+PROJECT GOAL:
+Build a modern responsive web application where developers can track GitHub activity, analyze productivity insights, manage tasks, and visualize coding performance using real APIs.
+
+This project must look like a real SaaS product suitable for a frontend developer portfolio.
+
+TECH STACK (MANDATORY):
+
+Frontend:
+- React.js + TypeScript
+- Vite
+- TailwindCSS
+- React Router
+- Zustand or Redux Toolkit for global state management
+- React Query/TanStack Query for server state
+- React Hook Form + Zod validation
+- Recharts for analytics visualization
+- Framer Motion for animations
+
+Testing:
+- Vitest
+- React Testing Library
+
+Code Quality:
+- ESLint
+- Prettier
+- Clean folder architecture
+- Environment variables
+
+Deployment:
+- Vercel compatible
+
+API:
+Use public APIs where possible.
+
+Primary API:
+GitHub REST API
+
+Features:
+
+1. AUTHENTICATION SIMULATION
+----------------------------
+Create a fake authentication flow.
+
+Requirements:
+- Login/Register UI
+- Store session using localStorage
+- Protected routes
+- Logout functionality
+- Authentication context/state
+
+
+2. USER DASHBOARD
+------------------
+Create a professional dashboard.
+
+Display:
+
+- GitHub username
+- Profile image
+- Followers
+- Public repositories
+- Contribution statistics
+- Most used languages
+- Recent repositories
+- Recent commits
+
+Use GitHub API dynamically.
+
+Handle:
+- Loading states
+- Empty states
+- API failures
+- Rate limit errors
+
+
+3. ADVANCED SEARCH SYSTEM
+--------------------------
+Create a developer search feature.
+
+Users can:
+- Search GitHub users
+- Filter repositories
+- Sort results
+- Save favorite developers
+
+Implement:
+- Debounced search
+- API caching
+- Pagination
+- Optimized rendering
+
+
+4. PRODUCTIVITY TASK MODULE
+----------------------------
+Create an internal productivity tracker.
+
+Features:
+
+- Create tasks
+- Edit tasks
+- Delete tasks
+- Drag and drop task board
+
+Columns:
+
+Todo
+In Progress
+Completed
+
+Use:
+- React state management
+- Optimistic UI updates
+
+
+5. ANALYTICS PAGE
+------------------
+Create visual analytics.
+
+Include:
+
+- Weekly coding activity chart
+- Repository statistics
+- Language distribution
+- Productivity score
+
+Use charts with responsive design.
+
+
+6. ADVANCED FRONTEND ENGINEERING REQUIREMENTS
+----------------------------------------------
+
+Must implement:
+
+Performance:
+- Lazy loading
+- Code splitting
+- Memoization
+- React.memo
+- useMemo
+- useCallback
+- Virtualized lists where required
+
+
+State Management:
+Separate:
+
+- Server state
+- UI state
+- Authentication state
+
+
+Error Handling:
+Create:
+
+- Global error boundary
+- API error handler
+- Custom error pages
+- Retry mechanism
+
+
+Responsive Design:
+Support:
+
+- Mobile
+- Tablet
+- Desktop
+
+Follow modern SaaS UI principles.
+
+
+7. UI REQUIREMENTS
+------------------
+
+Design inspiration:
+
+Linear
+Vercel Dashboard
+GitHub Dashboard
+Notion
+
+Create:
+
+- Sidebar navigation
+- Navbar
+- Cards
+- Tables
+- Modals
+- Toast notifications
+- Skeleton loaders
+- Empty states
+
+Use dark/light theme switching.
+
+
+8. PROJECT STRUCTURE
+---------------------
+
+Generate scalable architecture:
+
+src/
+
+components/
+  ui/
+  common/
+
+features/
+
+hooks/
+
+services/
+
+store/
+
+routes/
+
+utils/
+
+types/
+
+pages/
+
+tests/
+
+
+9. DEVELOPER EXPERIENCE
+------------------------
+
+Include:
+
+README.md
+
+Containing:
+
+- Project overview
+- Features
+- Installation steps
+- Environment setup
+- API configuration
+- Testing commands
+- Deployment instructions
+
+
+10. GIT READY
+--------------
+
+Prepare project for GitHub.
+
+Include:
+
+.gitignore
+
+Proper commit structure:
+
+commit 1:
+Initial setup
+
+commit 2:
+UI implementation
+
+commit 3:
+API integration
+
+commit 4:
+State management
+
+commit 5:
+Testing
+
+commit 6:
+Deployment preparation
+
+
+IMPORTANT IMPLEMENTATION RULES:
+
+1. Do not create fake static data except where API limitations require fallback data.
+
+2. Every component must be reusable.
+
+3. Avoid unnecessary dependencies.
+
+4. Write production-quality TypeScript.
+
+5. Add comments only where logic is complex.
+
+6. Follow SOLID frontend principles.
+
+7. The final application must run successfully using:
+
+npm install
+
+npm run dev
+
+
+8. Before completing:
+- Check all imports
+- Fix TypeScript errors
+- Fix build errors
+- Ensure responsive behavior
+- Ensure tests pass
+
+
+OUTPUT FORMAT:
+
+First provide:
+
+1. Architecture explanation
+2. Complete folder structure
+3. Installation commands
+
+Then generate the code file-by-file.
+
+Do not skip files.
+Do not provide pseudo-code.
+Generate working production-ready code.

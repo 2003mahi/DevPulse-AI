@@ -1,22 +1,24 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: DevPulse API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: tasks
+    description: Kanban task management
+  - name: favorites
+    description: Saved favorite developers
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +26,158 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /tasks:
+    get:
+      operationId: getTasks
+      tags: [tasks]
+      summary: List all tasks
+      responses:
+        "200":
+          description: Task list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /tasks/{id}:
+    get:
+      operationId: getTask
+      tags: [tasks]
+      summary: Get a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      summary: Delete a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /tasks/stats:
+    get:
+      operationId: getTaskStats
+      tags: [tasks]
+      summary: Get task statistics per column
+      responses:
+        "200":
+          description: Task stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStats"
+
+  /favorites:
+    get:
+      operationId: getFavorites
+      tags: [favorites]
+      summary: List saved favorite developers
+      responses:
+        "200":
+          description: Favorites list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FavoriteDeveloper"
+    post:
+      operationId: addFavorite
+      tags: [favorites]
+      summary: Save a favorite developer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteDeveloperInput"
+      responses:
+        "201":
+          description: Saved favorite
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteDeveloper"
+
+  /favorites/{githubLogin}:
+    delete:
+      operationId: removeFavorite
+      tags: [favorites]
+      summary: Remove a saved favorite developer
+      parameters:
+        - name: githubLogin
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removed
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +188,117 @@ components:
       required:
         - status
 
+    Task:
+      type: object
+      required: [id, title, column, priority, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        column:
+          type: string
+          enum: [todo, in_progress, completed]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        tags:
+          type: ["string", "null"]
+        position:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: ["string", "null"]
+
+    TaskInput:
+      type: object
+      required: [title, column, priority]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        column:
+          type: string
+          enum: [todo, in_progress, completed]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        tags:
+          type: string
+        position:
+          type: integer
+
+    TaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        column:
+          type: string
+          enum: [todo, in_progress, completed]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        tags:
+          type: string
+        position:
+          type: integer
+
+    TaskStats:
+      type: object
+      required: [todo, inProgress, completed, total]
+      properties:
+        todo:
+          type: integer
+        inProgress:
+          type: integer
+        completed:
+          type: integer
+        total:
+          type: integer
+
+    FavoriteDeveloper:
+      type: object
+      required: [id, githubLogin, avatarUrl, savedAt]
+      properties:
+        id:
+          type: integer
+        githubLogin:
+          type: string
+        avatarUrl:
+          type: string
+        name:
+          type: ["string", "null"]
+        bio:
+          type: ["string", "null"]
+        followers:
+          type: ["integer", "null"]
+        publicRepos:
+          type: ["integer", "null"]
+        savedAt:
+          type: string
+
+    FavoriteDeveloperInput:
+      type: object
+      required: [githubLogin, avatarUrl]
+      properties:
+        githubLogin:
+          type: string
+        avatarUrl:
+          type: string
+        name:
+          type: string
+        bio:
+          type: string
+        followers:
+          type: integer
+        publicRepos:
+          type: integer
